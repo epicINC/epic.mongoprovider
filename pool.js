@@ -18,17 +18,20 @@ class Pool extends EventEmitter {
 
 
 	en (key, value) {
+		debug('en', key);
 		(this.cache[key] || (this.cache[key] = new Queue())).en(value);
 		this.emit('en', {key, value});
 	}
 
 	de (key) {
+		debug('de', key);
 		return this[dispatcher](key, this.cache[key]);
 	}
 
 
 	[create] (key) {
 		assert(this.initializer[key], 'initializer not found.');
+		debug('init', key);
 		this.cache[key].en(this.initializer[key]());
 	}
 
@@ -39,7 +42,8 @@ class Pool extends EventEmitter {
 			this[create](key);
 		}
 
-		return epic.with(queue.de(), value => this.emit('de', {key, value}));
+		//return epic.with(queue.de(), value => this.emit('de', {key, value}));
+		return epic.with(queue.peek(), value => this.emit('de', {key, value}));
 	}
 
 
@@ -61,10 +65,11 @@ class Pool extends EventEmitter {
 
 
 	static middleware (config) {
+		debug('pool middleware init.');
 		const pool = new Pool(Pool.initializer(config.dataSources));
 
-		let used = [];
-		pool.on('de', used.push);
+		//let used = [];
+		//pool.on('de', used.push);
 
 		return async function PoolNext(context, next) {
 			context.connectionManager = pool;
@@ -72,10 +77,11 @@ class Pool extends EventEmitter {
 
 			next && await next();
 
-			if (used.length > 0) {
-				used.forEach(item => pool.en(item.key, item.value));
-				debug('Release one connections: %d', used.length);
-			}
+			//if (used.length > 0) {
+			//	used.forEach(item => pool.en(item.key, item.value));
+		//		used.length = 0;
+			//	debug('Release one connections: %d', used.length);
+			//}
 
 		}
 
