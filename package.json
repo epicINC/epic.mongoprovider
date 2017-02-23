@@ -1,6 +1,6 @@
 {
   "name": "epic.provider",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,11 +10,11 @@
   "license": "ISC",
   "dependencies": {
     "debug": "*",
+    "log4js": "^1.1.0",
     "mongodb": "*"
   },
   "devDependencies": {
-    "mocha" : "*",
-    "chai" : "*"
+    "mocha": "*",
+    "chai": "*"
   }
-
 }

@@ -3,13 +3,17 @@ const
 	config = require('../test/conf.js'),
 	Provider = require('../index')(config);
 
-co(function*() {
+
+
+async function test() {
 	let context = {}, provider;
-	yield Provider.bind(context)();
+	await Provider.bind(context)();
 	provider = context.provider('test');
 
-	yield provider.insertOne({id:1, name:'1'});
+	await provider.insertOne({id:1, name:'1'});
 	console.log(1);
-	console.log(yield provider.query({}, {project: {id:1, name:1}}));
+	console.log(await provider.query({}, {project: {id:1, name:1}}));
+}
 
-});
+
+test();
