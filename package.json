@@ -9,10 +9,12 @@
   "author": "S",
   "license": "ISC",
   "dependencies": {
-    "mongodb": "^2.1.41"
+    "mongodb": "^2.1.41",
+    "reflect-metadata": "^0.1.10"
   },
   "devDependencies": {
     "@types/mongodb": "^2.1.41",
-    "@types/node": "^7.0.8"
+    "@types/node": "^7.0.8",
+    "@types/reflect-metadata": "0.0.5"
   }
 }

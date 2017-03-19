@@ -15,7 +15,7 @@ export class Provder {
 	}
 
 	get (query: Number | String | filters.QueryFilter) {
-		if (typeof(query) !== 'object')
+		if (typeof(query) !== 'object') return;
 			
 	}
 
