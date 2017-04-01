@@ -1,6 +1,7 @@
 
-import * as mongodb from 'mongodb';
+import * as mongodb from '@types/mongodb';
 import * as filters from './models/filter';
+import epic = require('epic.util');
 
 
 
@@ -9,17 +10,24 @@ export class Provder {
 	collection: mongodb.Collection;
 	options: Object;
 
-	constructor(collection: mongodb.Collection, options: Object) {
-		this.collection = collection;
+	constructor(collection: mongodb.Collection | (() => Promise<mongodb.Collection>), options: Object) {
+		if (typeof(collection) === 'function')
+			this.init = async () => {
+				this.collection = await collection();
+				this.init = null;
+				return this.collection;
+			};
 		this.options = options;
 	}
 
-	get (query: Number | String | filters.QueryFilter) {
-		if (typeof(query) !== 'object') return;
-			
+	init: Action0;
+
+	async get (query: filters.Where) {
+		this.init && (await this.init());
+		return this.collection.findOne(query, filters.Options(query));
 	}
 
-	find (query: filters.QueryFilter) {
+	find (query: filters.Query) {
 
 	}
 
@@ -30,17 +38,17 @@ export class Provder {
 
 	}
 
-	upsert (where?: Number | String | filters.WhereFilter, data: any) {
+	upsert (where?: Number | String | filters.Where, data: any) {
 
 	}
 
 	// update
-	update (where?: Number | String | filters.WhereFilter, data: any) {
+	update (where?: Number | String | filters.Where, data: any) {
 
 	}
 
 	// delete
-	delete (where: Number | String | filters.WhereFilter) {
+	delete (where: Number | String | filters.Where) {
 
 	}
 

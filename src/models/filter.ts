@@ -1,4 +1,5 @@
 
+import * as mongodb from '@types/mongodb';
 
 export enum OrderType {
     asc = 0,
@@ -15,9 +16,9 @@ export type GeoPoint = {
 
 // for find etc...
 // ref: https://loopback.io/doc/en/lb2/Querying-data.html
-export type QueryFilter = {
-	fields?: String | String[] | FieldsFilter;
-	include?: String | String[] | IncludeFilter;
+export type Query = {
+	fields?: String | String[] | Fields;
+	include?: String | String[] | Include;
 	limit?: Number;
 
 	// { order: ['propertyName <ASC|DESC>', 'propertyName <ASC|DESC>',...] }
@@ -27,33 +28,33 @@ export type QueryFilter = {
 	offset?: Number;
 
 
-	where?: WhereFilter;
+	where?: Where;
 
 };
 
-export type FieldsFilter = {
+export type Fields = {
 	[name: string]: Boolean;
 };
 
-export type IncludeFilter = {
-	[name: string]: (IncludeFilter | String)[];
+export type Include = {
+	[name: string]: (Include | String)[];
 };
 
-export type OrderFilter = {
+export type Order = {
     [name: string]: Number | String | OrderType
 };
 
 
 // for update, delete, count
 // ref: https://loopback.io/doc/en/lb2/Where-filter.html
-export type WhereFilter = {
+export type Where = {
 	[name: string]: any;
 
 	// Operators
 	$eq?:	any;
 	$neq?:	any;
-	$and?:	WhereFilter[];
-	$or?:	WhereFilter[];
+	$and?:	Where[];
+	$or?:	Where[];
 	$gt?:	Number | Date;
 	$gte?:	Number | Date;
 	$lt?:	Number | Date;
@@ -67,4 +68,24 @@ export type WhereFilter = {
 	$regexp: String | RegExp;
 };
 
-export default QueryFilter;
+
+const options = new Set(['limit', 'sort', 'fields', 'skip', 'hint', 'explain', 'snapshot', 'timeout', 'tailable', 'batchSize', 'returnKey', 'maxScan', 'min', 'max', 'showDiskLoc', 'comment', 'raw', 'promoteLongs', 'promoteValues', 'promoteBuffers', 'readPreference', 'partial', 'maxTimeMS', 'collation']);
+
+
+
+
+export function Options (data: Query | Where) {
+	if (!data) return data;
+	let result: object;
+	Object.keys(data).forEach(e => {
+		if (!options.has(e)) return;
+		!result && (result = {});
+		result[e] = data[e];
+		delete data[e];
+	});
+	return result;
+}
+
+
+
+export default Query;

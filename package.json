@@ -2,7 +2,8 @@
   "name": "epic.provider",
   "version": "2.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index",
+  "typings": "dist/index",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,7 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "mongodb": "^2.1.41",
-    "reflect-metadata": "^0.1.10"
+    "reflect-metadata": "^0.1.10",
+	"epic.util": "next"
   },
   "devDependencies": {
     "@types/mongodb": "^2.1.41",
