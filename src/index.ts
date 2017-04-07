@@ -22,40 +22,42 @@ export class Provder {
 
 	init: Action0;
 
-	async get (query: filters.Where) {
+	async get (where: filters.Where) {
 		this.init && (await this.init());
-		return this.collection.findOne(query, filters.Options(query));
+		return this.collection.findOne(where);
 	}
 
-	find (query: filters.Query) {
-
+	async find (query: filters.Query) {
+		this.init && (await this.init());
+		return this.collection.find(query, filters.Options(query));
 	}
 
 
 	// create
-
-	insert (data: any | any[]) {
-
+	async insert (data: object | object[]) {
+		this.init && (await this.init());
+		return Array.isArray(data) ? this.collection.insertMany(data) : this.collection.insertOne(data);
 	}
 
-	upsert (where?: Number | String | filters.Where, data: any) {
-
+	async upsert (where?: filters.Where, data: any) {
+		this.init && (await this.init());
+		
 	}
 
 	// update
-	update (where?: Number | String | filters.Where, data: any) {
-
+	async update (where?: filters.Where, data: any) {
+		this.init && (await this.init());
 	}
 
 	// delete
-	delete (where: Number | String | filters.Where) {
-
+	async delete (where: filters.Where) {
+		this.init && (await this.init());
 	}
 
 
 
-	bulk (data: any[]) {
-
+	async bulk (data: any[]) {
+		this.init && (await this.init());
 	}
 
 };
