@@ -69,18 +69,18 @@ export type Where = {
 };
 
 
-const options = new Set(['limit', 'sort', 'fields', 'skip', 'hint', 'explain', 'snapshot', 'timeout', 'tailable', 'batchSize', 'returnKey', 'maxScan', 'min', 'max', 'showDiskLoc', 'comment', 'raw', 'promoteLongs', 'promoteValues', 'promoteBuffers', 'readPreference', 'partial', 'maxTimeMS', 'collation']);
+//const options = new Set(['limit', 'sort', 'fields', 'skip', 'hint', 'explain', 'snapshot', 'timeout', 'tailable', 'batchSize', 'returnKey', 'maxScan', 'min', 'max', 'showDiskLoc', 'comment', 'raw', 'promoteLongs', 'promoteValues', 'promoteBuffers', 'readPreference', 'partial', 'maxTimeMS', 'collation']);
 
 
+const options = new Set(['fields', 'include', 'limit', 'order', 'sort', 'skip', 'offset']);
 
-
-export function Options (data: Query | Where) {
+export function Options (data: Query) {
 	if (!data) return data;
 	let result: object;
 	Object.keys(data).forEach(e => {
 		if (!options.has(e)) return;
 		!result && (result = {});
-		result[e] = data[e];
+		result[e === 'order' ? 'sort' : e] = data[e];
 		delete data[e];
 	});
 	return result;

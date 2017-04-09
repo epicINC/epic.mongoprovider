@@ -1,6 +1,6 @@
 
 import * as mongodb from '@types/mongodb';
-import * as filters from './models/filter';
+import * as filter from './models/filter';
 import epic = require('epic.util');
 
 
@@ -22,14 +22,24 @@ export class Provder {
 
 	init: Action0;
 
-	async get (where: filters.Where) {
+	async get (query: filter.Query | filter.Where) {
 		this.init && (await this.init());
-		return this.collection.findOne(where);
+		if (query.hasOwnProperty('where'))
+			return this.collection.findOne(query, filter.Options(query));
+		else
+			return this.collection.findOne(query);
 	}
 
-	async find (query: filters.Query) {
+	async find (query: filter.Query | filter.Where) {
 		this.init && (await this.init());
-		return this.collection.find(query, filters.Options(query));
+		if (query.hasOwnProperty('where'))
+			return this.collection.find(query, filter.Options(query));
+		else
+			return this.collection.find(query);
+	}
+
+	async query (query: filter.Query | filter.Where) {
+		
 	}
 
 
@@ -39,25 +49,43 @@ export class Provder {
 		return Array.isArray(data) ? this.collection.insertMany(data) : this.collection.insertOne(data);
 	}
 
-	async upsert (where?: filters.Where, data: any) {
+	async upsertOne (where: filter.Where, data: any) {
 		this.init && (await this.init());
-		
+		return this.collection.updateOne(where, data, {upsert: true});
+	}
+
+	async upsertMany (where: filter.Where, data: any) {
+		this.init && (await this.init());
+		return this.collection.updateMany(where, data, {upsert: true, });
 	}
 
 	// update
-	async update (where?: filters.Where, data: any) {
+	async updateOne (where: filter.Where, data: any) {
 		this.init && (await this.init());
+		return this.collection.updateOne(where, data);
+	}
+
+	async updateMany (where: filter.Where, data: any) {
+		this.init && (await this.init());
+		return this.collection.updateMany(where, data);
 	}
 
 	// delete
-	async delete (where: filters.Where) {
+	async deleteOne (where: filter.Where) {
 		this.init && (await this.init());
+		return this.collection.deleteOne(where);
+	}
+
+	async deleteMany (where: filter.Where) {
+		this.init && (await this.init());
+		return this.collection.deleteMany(where);
 	}
 
 
 
 	async bulk (data: any[]) {
 		this.init && (await this.init());
+		return this.collection.bulkWrite(data);
 	}
 
 };
