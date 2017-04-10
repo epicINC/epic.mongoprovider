@@ -1,37 +1,46 @@
-import 'reflect-metadata';
+
 
 const keys = {
   id: Symbol('id')
-
 };
 
-function collection (name: string) : any ;
 
+class Metadata {
+	private map = new Map();
+
+	private upsert (target: Object, set: Object) {
+		let result = this.map.get(target);
+		if (!result) {
+			this.map.set(target, set);
+		} else
+			Object.assign(result, set);
+	}
+
+	get (constructor: Function) : Object {
+		return this.map.get(constructor.prototype);
+	}
+
+	id (target: Object, field: string | symbol) {
+		this.upsert(target, {id: field});
+	}
+
+	collection (target: Object, name: string) {
+		this.upsert(target, {collection: name});
+	}
+}
+
+
+export const metadata = new Metadata();
 
 // 主键编号
-function id () {
-  return Reflect.metadata(keys.id, 'id');
+export function id (target: Object, propertyKey: string | symbol) : void {
+	metadata.id(target, propertyKey);
+}
+
+export function collection (name: string) {
+	return function (constructor: Function) : void {
+		metadata.collection(constructor.prototype, name);
+	};
 }
 
 
-export class Greeter {
-    @format("Hello, %s")
-    greeting: string;
-
-    constructor(message: string) {
-        this.greeting = message;
-    }
-    greet() {
-        let formatString = getFormat(this, "greeting");
-        return formatString.replace("%s", this.greeting);
-    }
-}
-const formatMetadataKey = Symbol("format");
-
-function format(formatString: string) {
-    return Reflect.metadata(formatMetadataKey, formatString);
-}
-
-function getFormat(target: any, propertyKey: string) {
-    return Reflect.getMetadata(formatMetadataKey, target, propertyKey);
-}

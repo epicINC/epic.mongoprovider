@@ -1,5 +1,4 @@
 
-import * as mongodb from '@types/mongodb';
 
 export enum OrderType {
     asc = 0,
@@ -12,37 +11,8 @@ export type GeoPoint = {
 
     // 经度
     lng: Number;
-}
-
-// for find etc...
-// ref: https://loopback.io/doc/en/lb2/Querying-data.html
-export type Query = {
-	fields?: String | String[] | Fields;
-	include?: String | String[] | Include;
-	limit?: Number;
-
-	// { order: ['propertyName <ASC|DESC>', 'propertyName <ASC|DESC>',...] }
-	order?: String | String[];
-	// alias: offset
-	skip?: Number;
-	offset?: Number;
-
-
-	where?: Where;
-
 };
 
-export type Fields = {
-	[name: string]: Boolean;
-};
-
-export type Include = {
-	[name: string]: (Include | String)[];
-};
-
-export type Order = {
-    [name: string]: Number | String | OrderType
-};
 
 
 // for update, delete, count
@@ -64,15 +34,53 @@ export type Where = {
 	$nin?:	any[];
 	$near?:	String | Number[] | GeoPoint;
 	$like?:	any;
-	$nlike:	any;
-	$regexp: String | RegExp;
+	$nlike?:	any;
+	$regexp?: String | RegExp;
+
+	/*
+
+	$where: String | () => Boolean;
+	*/
 };
+
+
+export type Option = {
+	fields?: String | String[] | Fields;
+	include?: String | String[] | Include;
+	limit?: Number;
+
+	// { order: ['propertyName <ASC|DESC>', 'propertyName <ASC|DESC>',...] }
+	order?: String | String[];
+	// alias: offset
+	skip?: Number;
+	offset?: Number;
+};
+
+
+// for find etc...
+// ref: https://loopback.io/doc/en/lb2/Querying-data.html
+export type Query = Option & {
+	where?: Where;
+};
+
+export type Fields = {
+	[name: string]: Boolean;
+};
+
+export type Include = {
+	[name: string]: (Include | String)[];
+};
+
+export type Order = {
+    [name: string]: Number | String | OrderType
+};
+
 
 
 //const options = new Set(['limit', 'sort', 'fields', 'skip', 'hint', 'explain', 'snapshot', 'timeout', 'tailable', 'batchSize', 'returnKey', 'maxScan', 'min', 'max', 'showDiskLoc', 'comment', 'raw', 'promoteLongs', 'promoteValues', 'promoteBuffers', 'readPreference', 'partial', 'maxTimeMS', 'collation']);
 
 
-const options = new Set(['fields', 'include', 'limit', 'order', 'sort', 'skip', 'offset']);
+export const options = new Set(['fields', 'include', 'limit', 'order', 'sort', 'skip', 'offset']);
 
 export function Options (data: Query) {
 	if (!data) return data;
@@ -85,7 +93,6 @@ export function Options (data: Query) {
 	});
 	return result;
 }
-
 
 
 export default Query;
