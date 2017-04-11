@@ -13,11 +13,11 @@ export type GeoPoint = {
     lng: Number;
 };
 
-
+Operators
 
 // for update, delete, count
 // ref: https://loopback.io/doc/en/lb2/Where-filter.html
-export type Where = {
+export type Where1 = {
 	[name: string]: any;
 
 	// Operators
@@ -42,7 +42,6 @@ export type Where = {
 	$where: String | () => Boolean;
 	*/
 };
-
 
 export type Option = {
 	fields?: String | String[] | Fields;
