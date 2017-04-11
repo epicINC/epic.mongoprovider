@@ -7,6 +7,10 @@ class Provider<T> {
 	constructor (type: T) {
 		this.type = type;
 	}
+
+	get (id: number | string);
+	get ()
+
 }
 
 

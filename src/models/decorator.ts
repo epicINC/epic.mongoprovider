@@ -1,46 +1,35 @@
 
 
-const keys = {
-  id: Symbol('id')
+
+export type Schema = {
+	model: Object;
+	id: string | symbol;
+	collection: string;
 };
 
 
-class Metadata {
-	private map = new Map();
 
-	private upsert (target: Object, set: Object) {
-		let result = this.map.get(target);
-		if (!result) {
-			this.map.set(target, set);
-		} else
-			Object.assign(result, set);
+export class Metadata {
+	private static map = new WeakMap<Object, Partial<Schema>>();
+
+	static set (target: Object, data: Partial<Schema>) {
+		let result = Metadata.map.get(target);
+		if (!result)
+			Metadata.map.set(target, {model: target});
+		Object.assign(result, data);
 	}
 
-	get (constructor: Function) : Object {
-		return this.map.get(constructor.prototype);
-	}
-
-	id (target: Object, field: string | symbol) {
-		this.upsert(target, {id: field});
-	}
-
-	collection (target: Object, name: string) {
-		this.upsert(target, {collection: name});
+	static get (constructor: Function) : Object {
+		return Metadata.map.get(constructor.prototype);
 	}
 }
 
-
-export const metadata = new Metadata();
-
-// 主键编号
 export function id (target: Object, propertyKey: string | symbol) : void {
-	metadata.id(target, propertyKey);
+	Metadata.set(target, {id: propertyKey});
 }
 
 export function collection (name: string) {
 	return function (constructor: Function) : void {
-		metadata.collection(constructor.prototype, name);
+		Metadata.set(constructor.prototype, {collection: name});
 	};
 }
-
-

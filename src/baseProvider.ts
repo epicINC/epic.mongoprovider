@@ -19,94 +19,88 @@ class Util {
 }
 
 
-export default class BaseProvder {
+export interface IProvder<T> {
+	get (query: filter.Query | filter.Where) : Promise<T>;
+	find (query: filter.Query | filter.Where) : Promise<mongodb.Cursor<T>>;
+	query (query: filter.Query | filter.Where) : Promise<T[]>;
+	insert (data: T | T[]) : Promise<mongodb.InsertOneWriteOpResult>;
+	updateOne (where: filter.Where, data: T) : Promise<mongodb.UpdateWriteOpResult>;
+	upsertMany (where: filter.Where, data: T) : Promise<mongodb.UpdateWriteOpResult>;
+	deleteOne (where: filter.Where) : Promise<mongodb.DeleteWriteOpResultObject>;
+	deleteMany (where: filter.Where) : Promise<mongodb.DeleteWriteOpResultObject>;
+	bulk (data: any[]) : Promise<mongodb.BulkWriteOpResultObject>;
+	count (query: filter.Query | filter.Where) : Promise<number>;
+}
 
-	collection: mongodb.Collection;
+
+export default class BaseProvder implements IProvder<any> {
+
+	promise: Promise<mongodb.Collection>;
 	options: Object;
 
-	constructor(collection: mongodb.Collection | Promise<mongodb.Collection> | (() => Promise<mongodb.Collection>), options?: Object) {
+	constructor(collection: mongodb.Collection)
+	constructor(collection: Promise<mongodb.Collection>)
+	constructor(collection: Func0<Promise<mongodb.Collection>>)
+	constructor(collection: mongodb.Collection | Promise<mongodb.Collection> | Func0<Promise<mongodb.Collection>>, options?: Object) {
 		if (typeof(collection) === 'function')
-			this.init = async () => {
-				this.collection = await collection();
-				this.init = null;
-				return this.collection;
-			};
-		else if (collection instanceof Promise) {
-			this.init = async () => {
-				this.collection = await collection;
-				this.init = null;
-				return this.collection;
-			};
-		} else
-			this.collection = collection;
+			this.promise = collection();
+		else if (collection instanceof Promise)
+			this.promise = collection;
+		else if ((collection as Object).constructor.name === 'Collection')
+			this.promise = Promise.resolve(collection);
+		else
+			throw new TypeError(`unsupport type: ${(collection as Object).constructor.name}`);
 		this.options = options;
 	}
 
-	init: Action0;
-
-	async get (query: filter.Query | filter.Where) {
-		this.init && (await this.init());
-		if (query.hasOwnProperty('where'))
-			return this.collection.findOne(query, filter.Options(query));
-		else
-			return this.collection.findOne(query);
+	get (query: filter.Query | filter.Where) {
+		return this.promise.then(e => query.hasOwnProperty('where') ? e.findOne(query, filter.Options(query)) : e.findOne(query));
 	}
 
-	async find (query: filter.Query | filter.Where) {
-		this.init && (await this.init());
-		if (query.hasOwnProperty('where'))
-			return Util.cursor(this.collection.find((<filter.Query>query).where), query);
-
-		return this.collection.find(query);
+	find (query: filter.Query | filter.Where) {
+		return this.promise.then(e => query.hasOwnProperty('where') ? Util.cursor(e.find((<filter.Query>query).where), query) : e.find(query));
 	}
 
-	async query (query: filter.Query | filter.Where) {
-		return (await this.find(query)).toArray();
+	query (query: filter.Query | filter.Where) {
+		return this.find(query).then(e => e.toArray());
 	}
 
 	// create
-	async insert (data: Object | Object[]) {
-		this.init && (await this.init());
-		return Array.isArray(data) ? this.collection.insertMany(data) : this.collection.insertOne(data);
+	insert (data: Object | Object[]) {
+		return this.promise.then<mongodb.InsertWriteOpResult | mongodb.InsertOneWriteOpResult>(e => Array.isArray(data) ? e.insertMany(data) : e.insertOne(data));
 	}
 
-	async upsertOne (where: filter.Where, data: any) {
-		this.init && (await this.init());
-		return this.collection.updateOne(where, data, {upsert: true});
+	upsertOne (where: filter.Where, data: any) {
+		return this.promise.then(e => e.updateOne(where, data, {upsert: true}));
 	}
 
-	async upsertMany (where: filter.Where, data: any) {
-		this.init && (await this.init());
-		return this.collection.updateMany(where, data, {upsert: true, });
+	upsertMany (where: filter.Where, data: any) {
+		return this.promise.then(e => e.updateMany(where, data, {upsert: true}));
 	}
 
 	// update
-	async updateOne (where: filter.Where, data: any) {
-		this.init && (await this.init());
-		return this.collection.updateOne(where, data);
+	updateOne (where: filter.Where, data: any) {
+		return this.promise.then(e => e.updateOne(where, data));
 	}
 
-	async updateMany (where: filter.Where, data: any) {
-		this.init && (await this.init());
-		return this.collection.updateMany(where, data);
+	updateMany (where: filter.Where, data: any) {
+		return this.promise.then(e => e.updateMany(where, data));
 	}
 
 	// delete
-	async deleteOne (where: filter.Where) {
-		this.init && (await this.init());
-		return this.collection.deleteOne(where);
+	deleteOne (where: filter.Where) {
+		return this.promise.then(e => e.deleteOne(where));
 	}
 
-	async deleteMany (where: filter.Where) {
-		this.init && (await this.init());
-		return this.collection.deleteMany(where);
+	deleteMany (where: filter.Where) {
+		return this.promise.then(e => e.deleteMany(where));
 	}
 
-
-
-	async bulk (data: any[]) {
-		this.init && (await this.init());
-		return this.collection.bulkWrite(data);
+	bulk (data: any[]) {
+		return this.promise.then(e => e.bulkWrite(data));
 	}
 
+	count (query: filter.Query | filter.Where) {
+		return this.promise.then(e => e.count(query));
+	}
 }

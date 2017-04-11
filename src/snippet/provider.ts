@@ -1,12 +1,13 @@
 
 import * as mongodb from 'mongodb';
-import Provider from '../index';
-import {id, collection, metadata} from '../models/decorator';
+import Provider from '../provider';
+import {id, collection} from '../models/decorator';
 
 const connectionStrings = 'mongodb://192.168.16.151/LXTGroup';
 
 
 
+/*
 
 @collection('Userv4')
 class User {
@@ -35,3 +36,4 @@ async function test () {
 }
 
 test();
+*/
