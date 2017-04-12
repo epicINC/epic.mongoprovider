@@ -20,20 +20,20 @@ class Util {
 
 
 export interface IProvder<T> {
-	get (query: filter.Query | filter.Where) : Promise<T>;
-	find (query: filter.Query | filter.Where) : Promise<mongodb.Cursor<T>>;
-	query (query: filter.Query | filter.Where) : Promise<T[]>;
+	get (query: filter.Query<T> | filter.Where<T>) : Promise<T>;
+	find (query: filter.Query<T> | filter.Where<T>) : Promise<mongodb.Cursor<T>>;
+	query (query: filter.Query<T> | filter.Where<T>) : Promise<T[]>;
 	insert (data: T | T[]) : Promise<mongodb.InsertOneWriteOpResult>;
-	updateOne (where: filter.Where, data: T) : Promise<mongodb.UpdateWriteOpResult>;
-	upsertMany (where: filter.Where, data: T) : Promise<mongodb.UpdateWriteOpResult>;
-	deleteOne (where: filter.Where) : Promise<mongodb.DeleteWriteOpResultObject>;
-	deleteMany (where: filter.Where) : Promise<mongodb.DeleteWriteOpResultObject>;
+	updateOne (where: filter.Where<T>, data: T) : Promise<mongodb.UpdateWriteOpResult>;
+	upsertMany (where: filter.Where<T>, data: T) : Promise<mongodb.UpdateWriteOpResult>;
+	deleteOne (where: filter.Where<T>) : Promise<mongodb.DeleteWriteOpResultObject>;
+	deleteMany (where: filter.Where<T>) : Promise<mongodb.DeleteWriteOpResultObject>;
 	bulk (data: any[]) : Promise<mongodb.BulkWriteOpResultObject>;
-	count (query: filter.Query | filter.Where) : Promise<number>;
+	count (query: filter.Query<T> | filter.Where<T>) : Promise<number>;
 }
 
 
-export default class BaseProvder implements IProvder<any> {
+export default class BaseProvder<T = Object> implements IProvder<T> {
 
 	promise: Promise<mongodb.Collection>;
 	options: Object;
@@ -53,15 +53,15 @@ export default class BaseProvder implements IProvder<any> {
 		this.options = options;
 	}
 
-	get (query: filter.Query | filter.Where) {
+	get (query: filter.Query<T> | filter.Where<T>) {
 		return this.promise.then(e => query.hasOwnProperty('where') ? e.findOne(query, filter.Options(query)) : e.findOne(query));
 	}
 
-	find (query: filter.Query | filter.Where) {
-		return this.promise.then(e => query.hasOwnProperty('where') ? Util.cursor(e.find((<filter.Query>query).where), query) : e.find(query));
+	find (query: filter.Query<T> | filter.Where<T>) {
+		return this.promise.then(e => query.hasOwnProperty('where') ? Util.cursor(e.find((query as filter.Query<T>).where), query) : e.find(query));
 	}
 
-	query (query: filter.Query | filter.Where) {
+	query (query: filter.Query<T> | filter.Where<T>) {
 		return this.find(query).then(e => e.toArray());
 	}
 
@@ -70,37 +70,37 @@ export default class BaseProvder implements IProvder<any> {
 		return this.promise.then<mongodb.InsertWriteOpResult | mongodb.InsertOneWriteOpResult>(e => Array.isArray(data) ? e.insertMany(data) : e.insertOne(data));
 	}
 
-	upsertOne (where: filter.Where, data: any) {
-		return this.promise.then(e => e.updateOne(where, data, {upsert: true}));
+	upsertOne (where: filter.Where<T>, data: any) {
+		return this.promise.then(e => e.updateOne(<Object>where, data, {upsert: true}));
 	}
 
-	upsertMany (where: filter.Where, data: any) {
-		return this.promise.then(e => e.updateMany(where, data, {upsert: true}));
+	upsertMany (where: filter.Where<T>, data: any) {
+		return this.promise.then(e => e.updateMany(<Object>where, data, {upsert: true}));
 	}
 
 	// update
-	updateOne (where: filter.Where, data: any) {
-		return this.promise.then(e => e.updateOne(where, data));
+	updateOne (where: filter.Where<T>, data: any) {
+		return this.promise.then(e => e.updateOne(<Object>where, data));
 	}
 
-	updateMany (where: filter.Where, data: any) {
-		return this.promise.then(e => e.updateMany(where, data));
+	updateMany (where: filter.Where<T>, data: any) {
+		return this.promise.then(e => e.updateMany(<Object>where, data));
 	}
 
 	// delete
-	deleteOne (where: filter.Where) {
-		return this.promise.then(e => e.deleteOne(where));
+	deleteOne (where: filter.Where<T>) {
+		return this.promise.then(e => e.deleteOne(<Object>where));
 	}
 
-	deleteMany (where: filter.Where) {
-		return this.promise.then(e => e.deleteMany(where));
+	deleteMany (where: filter.Where<T>) {
+		return this.promise.then(e => e.deleteMany(<Object>where));
 	}
 
 	bulk (data: any[]) {
 		return this.promise.then(e => e.bulkWrite(data));
 	}
 
-	count (query: filter.Query | filter.Where) {
-		return this.promise.then(e => e.count(query));
+	count (query: filter.Query<T> | filter.Where<T>) {
+		return this.promise.then(e => e.count(<Object>query));
 	}
 }

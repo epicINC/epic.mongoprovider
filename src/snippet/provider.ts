@@ -1,13 +1,10 @@
 
 import * as mongodb from 'mongodb';
-import Provider from '../provider';
+import baseProvider from '../baseProvider';
 import {id, collection} from '../models/decorator';
 
 const connectionStrings = 'mongodb://192.168.16.151/LXTGroup';
 
-
-
-/*
 
 @collection('Userv4')
 class User {
@@ -25,10 +22,10 @@ class Group {
 
 async function test () {
 	let connection = mongodb.MongoClient.connect(connectionStrings);
-	let provider = new Provider(connection.then(e => e.collection('Userv4')));
+	let provider = new baseProvider<User>(connection.then(e => e.collection('Userv4')));
 
 
-	await provider.deleteMany({id: 'test'});
+	await provider.deleteMany({hash: {$eq: ''}});
 
 	let r = await provider.insert({id: 'test'});
 	console.log(r);
@@ -36,4 +33,3 @@ async function test () {
 }
 
 test();
-*/

@@ -13,81 +13,76 @@ export type GeoPoint = {
     lng: Number;
 };
 
-Operators
+export type TopOperator<T = Object> = {
+	$and:	(TopOperator<T> | Partial<T> | { [P in keyof T]?: Partial<FieldOperator<T[P]>> })[];
+	$or:	(TopOperator<T> | Partial<T> | { [P in keyof T]?: Partial<FieldOperator<T[P]>> })[];
+};
+
+export type FieldOperator<V = Object> = {
+	$eq:	V;
+	$neq:	V;
+	$gt:	V;
+	$gte:	V;
+	$lt:	V;
+	$let:	V;
+	$between:	[V, V];
+	$in:	V[];
+	$nin:	V[];
+	$like:	V;
+	$nlike:	V;
+	$near:	String | Number[] | GeoPoint;
+	$regexp: String | RegExp;
+};
 
 // for update, delete, count
 // ref: https://loopback.io/doc/en/lb2/Where-filter.html
-export type Where1 = {
-	[name: string]: any;
+export type Where<T = Object> =  Partial<T> | { [P in keyof T]?: Partial<FieldOperator<T[P]>> } | Partial<TopOperator<T>>;
 
-	// Operators
-	$eq?:	any;
-	$neq?:	any;
-	$and?:	Where[];
-	$or?:	Where[];
-	$gt?:	Number | Date;
-	$gte?:	Number | Date;
-	$lt?:	Number | Date;
-	$let?:	Number | Date;
-	$between?:	any[];
-	$in?:	any[];
-	$nin?:	any[];
-	$near?:	String | Number[] | GeoPoint;
-	$like?:	any;
-	$nlike?:	any;
-	$regexp?: String | RegExp;
-
-	/*
-
-	$where: String | () => Boolean;
-	*/
-};
-
-export type Option = {
-	fields?: String | String[] | Fields;
-	include?: String | String[] | Include;
-	limit?: Number;
+export type Option<T> = {
+	fields: keyof T | (keyof T)[] | Partial<Fields<T>>;
+	include: String | String[] | Include;
+	limit: Number;
 
 	// { order: ['propertyName <ASC|DESC>', 'propertyName <ASC|DESC>',...] }
-	order?: String | String[];
+	order: String | String[];
 	// alias: offset
-	skip?: Number;
-	offset?: Number;
+	skip: Number;
+	offset: Number;
 };
 
 
 // for find etc...
 // ref: https://loopback.io/doc/en/lb2/Querying-data.html
-export type Query = Option & {
-	where?: Where;
+export type Query<T = Object> = Partial<Option<T>> & {
+	where?: Where<T>;
 };
 
-export type Fields = {
-	[name: string]: Boolean;
+export type Fields<T> = {
+	[P in keyof T]: Boolean;
 };
 
 export type Include = {
 	[name: string]: (Include | String)[];
 };
 
-export type Order = {
-    [name: string]: Number | String | OrderType
+export type Order<T> = {
+    [P in keyof T]: Number | OrderType
 };
-
-
-
-//const options = new Set(['limit', 'sort', 'fields', 'skip', 'hint', 'explain', 'snapshot', 'timeout', 'tailable', 'batchSize', 'returnKey', 'maxScan', 'min', 'max', 'showDiskLoc', 'comment', 'raw', 'promoteLongs', 'promoteValues', 'promoteBuffers', 'readPreference', 'partial', 'maxTimeMS', 'collation']);
-
 
 export const options = new Set(['fields', 'include', 'limit', 'order', 'sort', 'skip', 'offset']);
 
 export function Options (data: Query) {
 	if (!data) return data;
-	let result: object;
+	let result : object;
 	Object.keys(data).forEach(e => {
 		if (!options.has(e)) return;
 		!result && (result = {});
-		result[e === 'order' ? 'sort' : e] = data[e];
+		if (e === 'order')
+			e = 'sort';
+		else if (e === 'offset')
+			e = 'skip';
+
+		result[e] = data[e];
 		delete data[e];
 	});
 	return result;

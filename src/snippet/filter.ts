@@ -1,52 +1,35 @@
 
-export type GeoPoint = {
-    // 纬度
-    lat: Number;
+import * as filter from '../models/filter';
 
-    // 经度
-    lng: Number;
-};
+class User {
 
-
-type TopOperator<T> = {
-	$and:	{[P in keyof T]?: T[P] | {[O in keyof FieldOperator<T[P]>]?: FieldOperator<T[P]>[O]}[]};
-	$or:	{[P in keyof T]?: T[P] | {[O in keyof FieldOperator<T[P]>]?: FieldOperator<T[P]>[O]}[]};
-};
-
-type FieldOperator<V> = {
-	$eq:	V;
-	$neq:	V;
-	$gt:	V;
-	$gte:	V;
-	$lt:	V;
-	$let:	V;
-	$between:	[V, V];
-	$in:	V[];
-	$nin:	V[];
-	$like:	V;
-	$nlike:	V;
-	$near:	String | Number[] | GeoPoint;
-	$regexp: String | RegExp;
-};
-
-//type propertyOf<T = Object> = {[P in keyof T]?: T[P]};
-
-type Where<T = Object> = {
-	[P in keyof T]?:  Partial<FieldOperator<T[P]>>;
-};
-
-Pick
-/*
- | {
-	[P in keyof TopOperator<T>]?: TopOperator<T>[P];
-}
-*/
-type User = {
 	id: string;
-	name: string;
-	set: {a: number};
+	as: number;
+	ts: number;
+	ver: number;
 }
 
-let b : Where<User> = {id: 1};
+let top : Partial<filter.TopOperator<User>> = {
+	$or: [{id: 'test', as: {$gt: 1}}],
+	$and: [
+		{$or: [{id: 'test', ts: {$gt: 2}}]},
+		{$or: [{id: 'test', ts: {$gt: 2}}]}
+	]
 
-console.log(b);
+};
+
+console.log(top);
+
+let w : filter.Where<User> = {
+	id: {$eq: 'test', $nin: ['d'], $neq: 1}
+};
+
+console.log(w);
+
+
+let q : filter.Query<User> = {
+	where: w,
+	fields: ['as', 'ver']
+};
+
+console.log(q);
