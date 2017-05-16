@@ -1,6 +1,6 @@
 
 import * as mongodb from 'mongodb';
-import baseProvider from '../baseProvider';
+import baseProvider from '../provider';
 import {id, collection} from '../models/decorator';
 
 const connectionStrings = 'mongodb://192.168.16.151/LXTGroup';

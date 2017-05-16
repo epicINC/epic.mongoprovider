@@ -1,12 +1,13 @@
 
 import * as mongodb from '@types/mongodb';
-import * as filter from './models/filter';
+import * as filter from './filter';
+import IProvider from './iprovider';
 import epic = require('epic.util');
 
 
 
 class Util {
-	static cursor<T> (cursor: mongodb.Cursor<T>, options: filter.Option) {
+	static cursor<T> (cursor: mongodb.Cursor<T>, options: filter.Option<T>) {
 		if (options)
 			Object.entries(options).forEach(([key, val]: [string, any]) => {
 				if (!filter.options.has(key)) return;
@@ -19,29 +20,16 @@ class Util {
 }
 
 
-export interface IProvder<T> {
-	get (query: filter.Query<T> | filter.Where<T>) : Promise<T>;
-	find (query: filter.Query<T> | filter.Where<T>) : Promise<mongodb.Cursor<T>>;
-	query (query: filter.Query<T> | filter.Where<T>) : Promise<T[]>;
-	insert (data: T | T[]) : Promise<mongodb.InsertOneWriteOpResult>;
-	updateOne (where: filter.Where<T>, data: T) : Promise<mongodb.UpdateWriteOpResult>;
-	upsertMany (where: filter.Where<T>, data: T) : Promise<mongodb.UpdateWriteOpResult>;
-	deleteOne (where: filter.Where<T>) : Promise<mongodb.DeleteWriteOpResultObject>;
-	deleteMany (where: filter.Where<T>) : Promise<mongodb.DeleteWriteOpResultObject>;
-	bulk (data: any[]) : Promise<mongodb.BulkWriteOpResultObject>;
-	count (query: filter.Query<T> | filter.Where<T>) : Promise<number>;
-}
 
-
-export default class BaseProvder<T = Object> implements IProvder<T> {
+export default class Provider<T = Object> implements IProvider<T> {
 
 	promise: Promise<mongodb.Collection>;
 	options: Object;
 
-	constructor(collection: mongodb.Collection)
-	constructor(collection: Promise<mongodb.Collection>)
-	constructor(collection: Func0<Promise<mongodb.Collection>>)
-	constructor(collection: mongodb.Collection | Promise<mongodb.Collection> | Func0<Promise<mongodb.Collection>>, options?: Object) {
+	constructor (collection: mongodb.Collection)
+	constructor (collection: Promise<mongodb.Collection>)
+	constructor (collection: Func0<Promise<mongodb.Collection>>)
+	constructor (collection: mongodb.Collection | Promise<mongodb.Collection> | Func0<Promise<mongodb.Collection>>, options?: Object) {
 		if (typeof(collection) === 'function')
 			this.promise = collection();
 		else if (collection instanceof Promise)
