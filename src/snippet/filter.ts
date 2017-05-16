@@ -33,3 +33,26 @@ let q : filter.Query<User> = {
 };
 
 console.log(q);
+
+interface IUser {
+	id: string;
+	name: string;
+	as: number;
+	ts: number;
+}
+
+class User implements IUser {
+	id: string;
+	name: string;
+	as: number;
+	ts: number;
+}
+
+let user: IUser = {id: '', name: '', as: 0, ts: 0};
+
+type getUser = (e: IUser) => number;
+let getID : getUser = (e: IUser) => e.id;
+
+
+
+

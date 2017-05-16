@@ -5,7 +5,7 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "lib": ["es2017"],
-				"types" : ["node", "mongodb"],
+		"types" : ["node", "mongodb"],
         "sourceMap": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
