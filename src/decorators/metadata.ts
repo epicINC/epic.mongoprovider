@@ -1,24 +1,24 @@
+import { CollectionOptions, FieldOptions } from './options'
 
-export type Schema = {
-	model: Object;
-	id: string | symbol;
-	collection: string;
-	dataSource: string;
-};
+export class Metadata {
 
+	static map = new Map<Function, Partial<CollectionOptions>>()
 
-export default class Metadata {
-	private static map = new WeakMap<Object, Partial<Schema>>();
-
-	static set (target: Object, data: Partial<Schema>) {
-		let result = Metadata.map.get(target);
-		if (!result)
-			Metadata.map.set(target, {model: target});
-		Object.assign(result, data);
+	static class (ctor: Function, options?: Partial<CollectionOptions>) : Partial<CollectionOptions> {
+		let result = this.map.get(ctor)
+		if (!result) this.map.set(ctor, result = {name: ctor.name })
+		if (options) Object.assign(result, options)
+		return result;
 	}
 
-	static get (constructor: Function) : Partial<Schema> {
-		return Metadata.map.get(constructor.prototype);
+	static field (ctor: Function, name: string, options?: Partial<FieldOptions>) {
+		let result = this.class(ctor)
+		result.fields || (result.fields = {})
+		let property = result.fields[name] || (result.fields[name] = { })
+		if (options) Object.assign(property, options)
+		return property
 	}
+
 }
 
+export default Metadata

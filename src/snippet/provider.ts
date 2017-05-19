@@ -1,24 +1,17 @@
 
 import * as mongodb from 'mongodb';
 import baseProvider from '../provider';
-import {id, collection} from '../models/decorator';
+import { data } from '../decorators';
 
 const connectionStrings = 'mongodb://192.168.16.151/LXTGroup';
 
 
-@collection('Userv4')
+@data.collection('gadfasd')
 class User {
 
-	@id
 	hash: string;
 }
 
-@collection('Groupv4')
-class Group {
-
-	@id
-	id: string;
-}
 
 async function test () {
 	let connection = mongodb.MongoClient.connect(connectionStrings);

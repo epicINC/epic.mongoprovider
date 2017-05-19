@@ -12,11 +12,10 @@
   "dependencies": {
     "mongodb": "^2.1.41",
     "reflect-metadata": "^0.1.10",
-	"epic.util": "next"
+    "epic.util": "next"
   },
   "devDependencies": {
-    "@types/mongodb": "^2.1.41",
-    "@types/node": "^7.0.8",
-    "@types/reflect-metadata": "0.0.5"
+    "@types/mongodb": "^2.2.2",
+    "@types/node": "^7.0.18"
   }
 }
