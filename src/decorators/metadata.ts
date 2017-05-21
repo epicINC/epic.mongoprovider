@@ -11,7 +11,7 @@ export class Metadata {
 		return result;
 	}
 
-	static field (ctor: Function, name: string, options?: Partial<FieldOptions>) {
+	static field (ctor: Function, name: string | symbol, options?: Partial<FieldOptions>) {
 		let result = this.class(ctor)
 		result.fields || (result.fields = {})
 		let property = result.fields[name] || (result.fields[name] = { })

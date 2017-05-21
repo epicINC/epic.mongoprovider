@@ -11,13 +11,13 @@ export class data {
 	static collection () : Function
 	static collection (name: string) : Function
 	static collection (options: Partial<CollectionOptions>) : Function
-	static collection (ctor: Function) : void | Function
+	static collection <T extends Function>(ctor: T) : void | T
 	static collection (args?: any) : void | Function {
 		let type = typeof(args)
 		if (type !== 'function') return inner
 		inner(args)
 
-		function inner(ctor: Function) {
+		function inner<T extends Function>(ctor: T) : void | T {
 
 			switch (type) {
 				case 'string':
@@ -36,8 +36,32 @@ export class data {
 	static id () : Function
 	static id (route: string) : Function
 	static id (options: Partial<FieldOptions>) : Function
-	static id <T extends Function>(ctor: Function, name: string) : void | T
+	static id (target: Object, name: string | symbol) : void
 	static id (...args: any[]) : void | Function {
+		console.log(args.length)
+		let type = typeof(args[0])
+		if (args.length === 3 && args[2] === undefined) return inner(args[0], args[1])
+		return inner
+
+		function inner(target: Object, name: string | symbol) : void {
+			switch (type) {
+				case 'string':
+					Metadata.field(target.constructor, name, { name: args[0], primary: true })
+					break;
+				case 'object':
+					Metadata.field(target.constructor, name, { primary: true, ...args[0] })
+					break;
+				default:
+					Metadata.field(target.constructor, name, { primary: true })
+					break;
+			}
+		}
+	}
+
+	static field () : Function
+	static field (options: Partial<FieldOptions>) : Function
+	static field (target: Object, name: string | symbol) : void
+	static field (...args: any[]) : void | Function {
 		let type = typeof(args[0])
 		if (type !== 'function') return inner
 		inner(args[0], args[1])
@@ -45,18 +69,17 @@ export class data {
 		function inner (ctor: Function, name: string) {
 			switch (type) {
 				case 'string':
-					Metadata.field(ctor, name, { name: args[0], primary: true })
+					Metadata.field(ctor, name, { name: args[0], })
 					break;
 				case 'object':
-					Metadata.field(ctor, name, { primary: true, ...args[0] })
+					Metadata.field(ctor, name, { ...args[0] })
 					break;
 				default:
-					Metadata.field(ctor, name, { primary: true })
+					Metadata.field(ctor, name)
 					break;
 			}
 		}
 	}
-
 
 }
 /*

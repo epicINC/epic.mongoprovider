@@ -1,17 +1,18 @@
-
-import * as mongodb from 'mongodb';
-import baseProvider from '../provider';
+// import * as mongodb from 'mongodb';
+// import baseProvider from '../models/provider';
 import { data } from '../decorators';
 
-const connectionStrings = 'mongodb://192.168.16.151/LXTGroup';
+//const connectionStrings = 'mongodb://192.168.16.151/LXTGroup';
 
 
-@data.collection('gadfasd')
 class User {
 
-	hash: string;
-}
+	@data.field
+	hash: string
 
+
+}
+/*
 
 async function test () {
 	let connection = mongodb.MongoClient.connect(connectionStrings);
@@ -24,5 +25,5 @@ async function test () {
 	console.log(r);
 
 }
-
-test();
+*/
+// test();

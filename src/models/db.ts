@@ -1,5 +1,5 @@
 import {DataSource, ModelConfig, ObjectDic} from './config';
-import Metadata from './metadata';
+import Metadata from '../decorators/metadata';
 import IDB from './idb';
 import IProvider from './iprovider';
 import Provider from './provider';
@@ -40,9 +40,8 @@ class DB implements IDB {
     let dataSource = config.dataSource as String || schema.dataSource;
     let collection = config.collection as String || schema.collection;
     if (!dataSource) throw new Error(`not find ds: ${dataSource}`);
-    
-    return {this.connectionStrings[dataSource], }
-  } 
+    return this.connectionStrings[dataSource].connector
+  }
 
   Provider<T> (constructor: Function) : IProvider<T> {
     let result = this.cache.get(constructor) as Provider<T>;
