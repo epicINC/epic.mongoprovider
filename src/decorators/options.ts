@@ -12,3 +12,5 @@ export type FieldOptions = {
 	fulltext: boolean
 	index: boolean
 }
+
+

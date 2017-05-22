@@ -1,6 +1,6 @@
 import Metadata from './metadata'
 import { CollectionOptions, FieldOptions } from './options'
-
+// http://www.52chloe.com/Wiki/Document/3324793835434803200
 
 export type classDecorator = (ctor: Function) => Function
 
