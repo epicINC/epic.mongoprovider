@@ -2,23 +2,19 @@ import { CollectionOptions, FieldOptions } from './options'
 
 export class Metadata {
 
-	static map = new Map<Function, Partial<CollectionOptions>>()
+	static get (key: string | symbol, target: Function | Object, propertyKey: string | symbol) {
 
-	static class (ctor: Function, options?: Partial<CollectionOptions>) : Partial<CollectionOptions> {
-		let result = this.map.get(ctor)
-		if (!result) this.map.set(ctor, result = {name: ctor.name })
-		if (options) Object.assign(result, options)
-		return result;
 	}
 
-	static field (ctor: Function, name: string | symbol, options?: Partial<FieldOptions>) {
-		let result = this.class(ctor)
-		result.fields || (result.fields = {})
-		let property = result.fields[name] || (result.fields[name] = { })
-		if (options) Object.assign(property, options)
-		return property
+	static set (key: string | symbol, value: any, target: Function | Object, propertyKey: string | symbol) {
+
 	}
+
+	static del (key: string | symbol, target: Function | Object, propertyKey: string | symbol) {
+
+	}
+
+
 
 }
-
 export default Metadata
