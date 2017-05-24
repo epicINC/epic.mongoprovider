@@ -32,7 +32,7 @@ export class data {
 			}
 		}
 	}
-u
+
 	static id () : Function
 	static id (route: string) : Function
 	static id (options: Partial<FieldOptions>) : Function
