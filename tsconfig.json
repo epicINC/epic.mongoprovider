@@ -22,7 +22,8 @@
         "noUnusedParameters": true,
         "noUnusedLocals": true,
         "skipDefaultLibCheck": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+		"strictNullChecks": true
     },
     "formatCodeOptions": {
         "indentSize": 2,

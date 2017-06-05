@@ -1,17 +1,40 @@
 // import * as mongodb from 'mongodb';
 // import baseProvider from '../models/provider';
-import { data } from '../decorators';
+//import { data } from '../decorators';
 
 //const connectionStrings = 'mongodb://192.168.16.151/LXTGroup';
 
 
-class User {
+interface IUser {
+	hash: string
+}
 
-	@data.field
+
+class User implements IUser {
+
+	//@data.field
 	hash: string
 
 
 }
+
+function test(){
+
+}
+
+type UserDef = {
+	hash: string
+}
+
+
+let u = new User()
+
+
+
+console.log(u instanceof test)
+
+
+
 /*
 
 async function test () {
