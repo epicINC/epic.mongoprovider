@@ -1,6 +1,15 @@
 // https://github.com/pleerock/routing-controllers
 
-const state = new Map<Function, Object>();
+const
+	state = new Map<Function, Object>(),
+	symbol = {
+		column: Symbol.for('provider:field'),
+		method: Symbol.for('provider:method'),
+		collection: Symbol.for('provider:collection')
+	}
+
+
+
 
 
 export class Metadata {
