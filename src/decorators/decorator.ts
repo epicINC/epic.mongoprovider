@@ -1,5 +1,5 @@
 import Metadata from './metadata'
-import { CollectionOptions, FieldOptions } from './options'
+import { CollectionOption, ColumnOption } from './options'
 // http://www.52chloe.com/Wiki/Document/3324793835434803200
 
 export type classDecorator = (ctor: Function) => Function
@@ -10,7 +10,7 @@ export class data {
 
 	static collection () : Function
 	static collection (name: string) : Function
-	static collection (options: Partial<CollectionOptions>) : Function
+	static collection (options: Partial<CollectionOption>) : Function
 	static collection <T extends Function>(ctor: T) : void | T
 	static collection (args?: any) : void | Function {
 		let type = typeof(args)
@@ -35,7 +35,7 @@ export class data {
 
 	static id () : Function
 	static id (route: string) : Function
-	static id (options: Partial<FieldOptions>) : Function
+	static id (options: Partial<ColumnOption>) : Function
 	static id (target: Object, name: string | symbol) : void
 	static id (...args: any[]) : void | Function {
 		console.log(args.length)
@@ -58,10 +58,10 @@ export class data {
 		}
 	}
 
-	static field () : Function
-	static field (options: Partial<FieldOptions>) : Function
-	static field (target: Object, name: string | symbol) : void
-	static field (...args: any[]) : void | Function {
+	static column () : Function
+	static column (options: Partial<ColumnOption>) : Function
+	static column (target: Object, name: string | symbol) : void
+	static column (...args: any[]) : void | Function {
 		let type = typeof(args[0])
 		if (type !== 'function') return inner
 		inner(args[0], args[1])
@@ -69,13 +69,13 @@ export class data {
 		function inner (ctor: Function, name: string) {
 			switch (type) {
 				case 'string':
-					Metadata.field(ctor, name, { name: args[0], })
+					Metadata.column(ctor, name, { name: args[0], })
 					break;
 				case 'object':
-					Metadata.field(ctor, name, { ...args[0] })
+					Metadata.column(ctor, name, { ...args[0] })
 					break;
 				default:
-					Metadata.field(ctor, name)
+					Metadata.column(ctor, name)
 					break;
 			}
 		}

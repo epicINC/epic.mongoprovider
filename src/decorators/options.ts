@@ -4,7 +4,7 @@ export type CollectionOption = {
 	collection: string
 	fields: { [key: string]: Partial<ColumnOption> }
 }
-// Schema 
+// Schema
 export type ColumnOption = {
 	name: string
 	autoIncrement: boolean
@@ -14,5 +14,3 @@ export type ColumnOption = {
 	index: boolean
 	ignore: boolean
 }
-
-
