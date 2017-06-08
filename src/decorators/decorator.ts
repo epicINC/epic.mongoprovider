@@ -5,7 +5,7 @@ import { CollectionOption, ColumnOption } from './options'
 export type classDecorator = (ctor: Function) => Function
 
 /* tslint:disable:class-name */
-export class data {
+export class schema {
 
 
 	static collection () : Function
@@ -21,13 +21,13 @@ export class data {
 
 			switch (type) {
 				case 'string':
-					Metadata.class(ctor, { name: args })
+					Metadata.collection(ctor, { name: args })
 					break;
 				case 'object':
-					Metadata.class(ctor, { ...args })
+					Metadata.collection(ctor, { ...args })
 					break;
 				default:
-					Metadata.class(ctor)
+					// Metadata.collection(ctor)
 					break;
 			}
 		}
@@ -36,23 +36,23 @@ export class data {
 	static id () : Function
 	static id (route: string) : Function
 	static id (options: Partial<ColumnOption>) : Function
-	static id (target: Object, name: string | symbol) : void
+	static id (target: Object, name: PropertyKey) : void
 	static id (...args: any[]) : void | Function {
 		console.log(args.length)
 		let type = typeof(args[0])
 		if (args.length === 3 && args[2] === undefined) return inner(args[0], args[1])
 		return inner
 
-		function inner(target: Object, name: string | symbol) : void {
+		function inner(target: Object, name: PropertyKey) : void {
 			switch (type) {
 				case 'string':
-					Metadata.field(target.constructor, name, { name: args[0], primary: true })
+					Metadata.column(target.constructor, name, { name: args[0], primary: true })
 					break;
 				case 'object':
-					Metadata.field(target.constructor, name, { primary: true, ...args[0] })
+					Metadata.column(target.constructor, name, { primary: true, ...args[0] })
 					break;
 				default:
-					Metadata.field(target.constructor, name, { primary: true })
+					Metadata.column(target.constructor, name, { primary: true })
 					break;
 			}
 		}
@@ -60,7 +60,7 @@ export class data {
 
 	static column () : Function
 	static column (options: Partial<ColumnOption>) : Function
-	static column (target: Object, name: string | symbol) : void
+	static column (target: Object, name: PropertyKey) : void
 	static column (...args: any[]) : void | Function {
 		let type = typeof(args[0])
 		if (type !== 'function') return inner
@@ -75,7 +75,7 @@ export class data {
 					Metadata.column(ctor, name, { ...args[0] })
 					break;
 				default:
-					Metadata.column(ctor, name)
+					// Metadata.column(ctor, name)
 					break;
 			}
 		}
@@ -86,9 +86,9 @@ export class data {
 
 
 declare type ClassDecorator = <TFunction extends Function>(target: TFunction) => TFunction | void;
-declare type PropertyDecorator = (target: Object, propertyKey: string | symbol) => void;
-declare type MethodDecorator = <T>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
-declare type ParameterDecorator = (target: Object, propertyKey: string | symbol, parameterIndex: number) => void;
+declare type PropertyDecorator = (target: Object, propertyKey: PropertyKey) => void;
+declare type MethodDecorator = <T>(target: Object, propertyKey: PropertyKey, descriptor: TypedPropertyDescriptor<T>) => TypedPropertyDescriptor<T> | void;
+declare type ParameterDecorator = (target: Object, propertyKey: PropertyKey, parameterIndex: number) => void;
 
 
 class factory {
@@ -111,15 +111,15 @@ class factory {
 
 	}
 
-	static method <T extends Function>(ctor: T, key: string | symbol, descriptor: TypedPropertyDescriptor<T>) : TypedPropertyDescriptor<T> | void {
+	static method <T extends Function>(ctor: T, key: PropertyKey, descriptor: TypedPropertyDescriptor<T>) : TypedPropertyDescriptor<T> | void {
 
 	}
 
-	static parameter <T extends Function>(ctor: T, key: string | symbol, index: number) {
+	static parameter <T extends Function>(ctor: T, key: PropertyKey, index: number) {
 
 	}
 
-	static property <T extends Function>(ctor: T, key: string | symbol) {
+	static property <T extends Function>(ctor: T, key: PropertyKey) {
 
 	}
 

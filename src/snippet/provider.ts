@@ -1,6 +1,6 @@
 // import * as mongodb from 'mongodb';
 // import baseProvider from '../models/provider';
-//import { data } from '../decorators';
+import { schema } from '../decorators';
 
 //const connectionStrings = 'mongodb://192.168.16.151/LXTGroup';
 
@@ -9,18 +9,14 @@ interface IUser {
 	hash: string
 }
 
-
+@schema.collection
 class User implements IUser {
 
-	//@data.field
+	@schema.id
 	hash: string
-
-
 }
 
-function test(){
 
-}
 
 type UserDef = {
 	hash: string
