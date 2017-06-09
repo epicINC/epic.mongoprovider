@@ -1,15 +1,15 @@
 // import * as mongodb from 'mongodb';
 // import baseProvider from '../models/provider';
-import { schema } from '../decorators';
+import { schema } from '../decorators'
 
-//const connectionStrings = 'mongodb://192.168.16.151/LXTGroup';
+// const connectionStrings = 'mongodb://192.168.16.151/LXTGroup';
 
 
 interface IUser {
 	hash: string
 }
 
-@schema.collection
+@schema.collection()
 class User implements IUser {
 
 	@schema.id

@@ -1,8 +1,14 @@
 
+export type Schema = CollectionOption & {
+	columns: {[field: string]: ColumnOption}
+}
+
+
 export type CollectionOption = {
 	name: string
 	collection: string
-	fields: { [key: string]: Partial<ColumnOption> }
+	connectionStrings: string
+	map: string
 }
 // Schema
 export type ColumnOption = {

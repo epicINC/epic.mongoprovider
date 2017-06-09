@@ -11,7 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "epic.util": "next",
-    "mongodb": "^2.1.41",
     "reflect-metadata": "^0.1.10"
   },
   "devDependencies": {
