@@ -1,0 +1,10 @@
+
+
+declare global {
+
+}
+
+export default {}
+
+
+
