@@ -1,9 +1,6 @@
-
-import * as mongodb from '@types/mongodb';
-import * as filter from './filter';
-import IProvider from './iprovider';
-import epic = require('epic.util');
-
+import * as mongodb from 'mongodb'
+import * as filter from '../filters'
+import IProvider from './iprovider'
 
 
 class Util {
@@ -54,7 +51,7 @@ export default class Provider<T = Object> implements IProvider<T> {
 	}
 
 	// create
-	insert (data: Object | Object[]) {
+	insert (data: T | T[]) {
 		return this.promise.then<mongodb.InsertWriteOpResult | mongodb.InsertOneWriteOpResult>(e => Array.isArray(data) ? e.insertMany(data) : e.insertOne(data));
 	}
 
