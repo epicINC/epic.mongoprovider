@@ -1,86 +1,88 @@
-
-
 import * as mongodb from 'mongodb'
 import * as filter from '../filters'
 import IProvider from './iprovider'
-
+import * as epic from 'epic.util'
 
 class Util {
-	static cursor<T> (cursor: mongodb.Cursor<T>, options: filter.Option<T>) {
+	static cursor<T> (cursor: mongodb.Cursor<T>, options: object) {
 		if (options)
 			Object.entries(options).forEach(([key, val]: [string, any]) => {
-				if (!filter.options.has(key)) return;
-				if (key === 'order') key = 'sort';
-				if (key === 'fields') key = 'project';
-				cursor[key](val);
-			});
-		return cursor;
+				if (!filter.options.has(key)) return
+				if (key === 'order') key = 'sort'
+				if (key === 'fields') key = 'project'
+				cursor[key](val)
+			})
+		return cursor
 	}
+}
+
+function isQuery <T>(q: filter.Query<T> | filter.Where<T>) : q is filter.Query<T> {
+	return Reflect.has(q, 'where')
 }
 
 
 
-export default class Provider<T = Object> implements IProvider<T> {
+export default class Provider<T = object> implements IProvider<T> {
 
-	promise: Promise<mongodb.Collection>;
-	options: Object;
+	promise: Promise<mongodb.Collection>
+	options: object | undefined
 
 	constructor (collection: mongodb.Collection)
 	constructor (collection: Promise<mongodb.Collection>)
 	constructor (collection: Func0<Promise<mongodb.Collection>>)
-	constructor (collection: mongodb.Collection | Promise<mongodb.Collection> | Func0<Promise<mongodb.Collection>>, options?: Object) {
+	constructor (collection: mongodb.Collection | Promise<mongodb.Collection> | Func0<Promise<mongodb.Collection>>, options?: object) {
 		if (typeof(collection) === 'function')
-			this.promise = collection();
+			this.promise = collection()
 		else if (collection instanceof Promise)
-			this.promise = collection;
-		else if ((collection as Object).constructor.name === 'Collection')
-			this.promise = Promise.resolve(collection);
+			this.promise = collection
+		else if ((collection as object).constructor.name === 'Collection')
+			this.promise = Promise.resolve(collection)
 		else
-			throw new TypeError(`unsupport type: ${(collection as Object).constructor.name}`);
-		this.options = options;
+			throw new TypeError(`unsupport type: ${(collection as object).constructor.name}`)
+		this.options = options
 	}
 
 	get (query: filter.Query<T> | filter.Where<T>) {
-		return this.promise.then(e => query.hasOwnProperty('where') ? e.findOne(query, filter.Options(query)) : e.findOne(query));
+		return this.promise.then(e => isQuery(query) ? e.findOne(query as Object, filter.Options.findOne<T>(query)) : e.findOne(query))
 	}
 
 	find (query: filter.Query<T> | filter.Where<T>) {
-		return this.promise.then(e => query.hasOwnProperty('where') ? Util.cursor(e.find((query as filter.Query<T>).where), query) : e.find(query));
+		return this.promise.then(e => query.hasOwnProperty('where') ? Util.cursor(e.find((query as filter.Query<T>).where as Object), query) : e.find(query))
 	}
 
 	query (query: filter.Query<T> | filter.Where<T>) {
-		return this.find(query).then(e => e.toArray());
+		return this.find(query).then(e => e.toArray())
 	}
 
 	// create
 	insert (data: T | T[]) {
-		return this.promise.then<mongodb.InsertWriteOpResult | mongodb.InsertOneWriteOpResult>(e => Array.isArray(data) ? e.insertMany(data) : e.insertOne(data));
+		return this.promise.then<mongodb.InsertWriteOpResult | mongodb.InsertOneWriteOpResult>(e => Array.isArray(data) ? e.insertMany(data) : e.insertOne(data))
 	}
 
 	upsertOne (where: filter.Where<T>, data: any) {
-		return this.promise.then(e => e.updateOne(<Object>where, data, {upsert: true}));
+		return this.promise.then(e => e.updateOne(<object>where, data, {upsert: true}))
 	}
 
 	upsertMany (where: filter.Where<T>, data: any) {
-		return this.promise.then(e => e.updateMany(<Object>where, data, {upsert: true}));
+		return this.promise.then(e => e.updateMany(<object>where, data, {upsert: true}))
 	}
 
 	// update
 	updateOne (where: filter.Where<T>, data: any) {
-		return this.promise.then(e => e.updateOne(<Object>where, data));
+		return this.promise.then(e => e.updateOne(<object>where, data))
 	}
 
 	updateMany (where: filter.Where<T>, data: any) {
-		return this.promise.then(e => e.updateMany(<Object>where, data));
+		return this.promise.then(e => e.updateMany(<object>where, data))
 	}
 
 	// delete
 	deleteOne (where: filter.Where<T>) {
-		return this.promise.then(e => e.deleteOne(<Object>where));
+		return this.promise.then(e => e.deleteOne(<object>where))
 	}
 
 	deleteMany (where: filter.Where<T>) {
-		return this.promise.then(e => e.deleteMany(<Object>where));
+		return this.promise.then(e => e.deleteMany(<object>where))
 	}
 
 	bulk (data: any[]) {
@@ -88,6 +90,6 @@ export default class Provider<T = Object> implements IProvider<T> {
 	}
 
 	count (query: filter.Query<T> | filter.Where<T>) {
-		return this.promise.then(e => e.count(<Object>query));
+		return this.promise.then(e => e.count(<object>query))
 	}
 }
