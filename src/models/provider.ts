@@ -3,6 +3,21 @@ import * as filter from '../filters'
 import IProvider from './iprovider'
 import * as epic from 'epic.util'
 
+
+function test () {
+	if (true)
+		return true
+	else
+		return false
+}
+
+function test () {
+	if (true)
+		return true
+	return false
+}
+
+
 class Util {
 	static cursor<T> (cursor: mongodb.Cursor<T>, options: object) {
 		if (options)
@@ -19,8 +34,6 @@ class Util {
 function isQuery <T>(q: filter.Query<T> | filter.Where<T>) : q is filter.Query<T> {
 	return Reflect.has(q, 'where')
 }
-
-
 
 export default class Provider<T = object> implements IProvider<T> {
 
@@ -43,11 +56,15 @@ export default class Provider<T = object> implements IProvider<T> {
 	}
 
 	get (query: filter.Query<T> | filter.Where<T>) {
-		return this.promise.then(e => isQuery(query) ? e.findOne(query as Object, filter.Options.findOne<T>(query)) : e.findOne(query))
+		if (isQuery<T>(query))
+			return this.promise.then(e => e.findOne(query as Object, filter.Options.findOne<T>(query)))
+		return this.promise.then(e => e.findOne<T>(query as Object))
 	}
 
 	find (query: filter.Query<T> | filter.Where<T>) {
-		return this.promise.then(e => query.hasOwnProperty('where') ? Util.cursor(e.find((query as filter.Query<T>).where as Object), query) : e.find(query))
+		if (isQuery<T>(query))
+			return this.promise.then(e => Util.cursor(e.find((query as filter.Query<T>).where as Object), query))
+		return this.promise.then(e => e.find(query as Object))
 	}
 
 	query (query: filter.Query<T> | filter.Where<T>) {
@@ -56,7 +73,9 @@ export default class Provider<T = object> implements IProvider<T> {
 
 	// create
 	insert (data: T | T[]) {
-		return this.promise.then<mongodb.InsertWriteOpResult | mongodb.InsertOneWriteOpResult>(e => Array.isArray(data) ? e.insertMany(data) : e.insertOne(data))
+		if (Array.isArray(data))
+			return this.promise.then(e => e.insertMany(data))
+		return this.promise.then(e => e.insertOne(data))
 	}
 
 	upsertOne (where: filter.Where<T>, data: any) {

@@ -38,7 +38,6 @@ export type FieldOperator<V = object> = {
 // for update, delete, count
 // ref: https://loopback.io/doc/en/lb2/Where-filter.html
 export type Where<T = object> =  Partial<T> | { [P in keyof T]?: Partial<FieldOperator<T[P]>> } | Partial<TopOperator<T>>
-
 export type Option<T> = {
 	fields: keyof T | (keyof T)[] | Partial<FieldFilter<T>>
 	include: string | string[] | IncludeFilter
