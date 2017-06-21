@@ -1,7 +1,7 @@
 {
 	"rules": {
 		"class-name": true,
-		"interface-name": [true, "never-prefix"],
+		"interface-name": [false],
 		"comment-format": [true, "check-space"],
 		"indent": [true, "tab"],
 		"no-duplicate-variable": true,

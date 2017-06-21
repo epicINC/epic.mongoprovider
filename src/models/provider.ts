@@ -1,6 +1,7 @@
-import * as mongodb from 'mongodb'
+import * as mongodb from '@types/mongodb'
 import * as filter from '../filters'
 import IProvider from './iprovider'
+import { SchemaReader } from '../schemas'
 import * as epic from 'epic.util'
 
 
@@ -39,6 +40,7 @@ export default class Provider<T = object> implements IProvider<T> {
 
 	promise: Promise<mongodb.Collection>
 	options: object | undefined
+	schema: SchemaReader<T>
 
 	constructor (collection: mongodb.Collection)
 	constructor (collection: Promise<mongodb.Collection>)
@@ -53,6 +55,8 @@ export default class Provider<T = object> implements IProvider<T> {
 		else
 			throw new TypeError(`unsupport type: ${(collection as object).constructor.name}`)
 		this.options = options
+
+		this.schema = SchemaReader.instance<T>()
 	}
 
 	get (query: filter.Query<T> | filter.Where<T>) {
@@ -87,6 +91,13 @@ export default class Provider<T = object> implements IProvider<T> {
 	}
 
 	// update
+
+	update (data: T | T[]) {
+		if (Array.isArray(data))
+			return this.bulk(data.map(e => ({ updateOne: { filter: this.schema.ID(e), update: } })))
+		return this.updateOne(this.schema.ID(data), data)
+	}
+
 	updateOne (where: filter.Where<T>, data: any) {
 		return this.promise.then(e => e.updateOne(<object>where, data))
 	}
@@ -104,8 +115,8 @@ export default class Provider<T = object> implements IProvider<T> {
 		return this.promise.then(e => e.deleteMany(<object>where))
 	}
 
-	bulk (data: any[]) {
-		return this.promise.then(e => e.bulkWrite(data));
+	bulk (data: object[]) {
+		return this.promise.then(e => e.bulkWrite(data))
 	}
 
 	count (query: filter.Query<T> | filter.Where<T>) {
