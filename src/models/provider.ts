@@ -1,7 +1,7 @@
 import * as mongodb from '@types/mongodb'
 import * as filter from '../filters'
 import IProvider from './iprovider'
-import { SchemaReader } from '../schemas'
+import { Translator } from '../translators'
 import * as epic from 'epic.util'
 
 
