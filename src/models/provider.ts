@@ -56,7 +56,7 @@ export default class Provider<T = object> implements IProvider<T> {
 			throw new TypeError(`unsupport type: ${(collection as object).constructor.name}`)
 		this.options = options
 
-		this.schema = SchemaReader.instance<T>()
+		this.schema = Translator.instance<T>()
 	}
 
 	get (query: filter.Query<T> | filter.Where<T>) {
