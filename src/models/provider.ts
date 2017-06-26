@@ -5,19 +5,6 @@ import { Translator } from '../translators'
 import * as epic from 'epic.util'
 
 
-function test () {
-	if (true)
-		return true
-	else
-		return false
-}
-
-function test () {
-	if (true)
-		return true
-	return false
-}
-
 
 class Util {
 	static cursor<T> (cursor: mongodb.Cursor<T>, options: object) {
@@ -36,16 +23,21 @@ function isQuery <T>(q: filter.Query<T> | filter.Where<T>) : q is filter.Query<T
 	return Reflect.has(q, 'where')
 }
 
-export default class Provider<T = object> implements IProvider<T> {
+export function createProvider<T extends Object>(type: T) {
+	type.constructor
+}
+
+export default class Provider<T extends object> implements IProvider<T> {
 
 	promise: Promise<mongodb.Collection>
 	options: object | undefined
-	schema: SchemaReader<T>
+	translator: Translator<T>
 
 	constructor (collection: mongodb.Collection)
 	constructor (collection: Promise<mongodb.Collection>)
 	constructor (collection: Func0<Promise<mongodb.Collection>>)
 	constructor (collection: mongodb.Collection | Promise<mongodb.Collection> | Func0<Promise<mongodb.Collection>>, options?: object) {
+
 		if (typeof(collection) === 'function')
 			this.promise = collection()
 		else if (collection instanceof Promise)
@@ -56,7 +48,7 @@ export default class Provider<T = object> implements IProvider<T> {
 			throw new TypeError(`unsupport type: ${(collection as object).constructor.name}`)
 		this.options = options
 
-		this.schema = Translator.instance<T>()
+		this.translator = Translator.create(type)
 	}
 
 	get (query: filter.Query<T> | filter.Where<T>) {
@@ -94,8 +86,8 @@ export default class Provider<T = object> implements IProvider<T> {
 
 	update (data: T | T[]) {
 		if (Array.isArray(data))
-			return this.bulk(data.map(e => ({ updateOne: { filter: this.schema.ID(e), update: } })))
-		return this.updateOne(this.schema.ID(data), data)
+			return this.bulk(data.map(e => ({ updateOne: { filter: this.translator.ID(e), update: } })))
+		return this.updateOne(this.translator.ID(data), data)
 	}
 
 	updateOne (where: filter.Where<T>, data: any) {
