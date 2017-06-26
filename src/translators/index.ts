@@ -1,4 +1,4 @@
-import { MongoTranslator } from './mongo'
+export * from './mongo'
 
 export enum TranslatorType {
 	Mongo = 1

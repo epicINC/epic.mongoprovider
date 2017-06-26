@@ -1,7 +1,7 @@
 import * as mongodb from '@types/mongodb'
 import * as filter from '../filters'
 import IProvider from './iprovider'
-import { Translator } from '../translators'
+import { MongoTranslator } from '../translators'
 import * as epic from 'epic.util'
 
 
@@ -23,21 +23,21 @@ function isQuery <T>(q: filter.Query<T> | filter.Where<T>) : q is filter.Query<T
 	return Reflect.has(q, 'where')
 }
 
-export function createProvider<T extends Object>(type: T) {
-	type.constructor
+export function createProvider<T extends Object>(type: T)  {
+	
 }
 
 export default class Provider<T extends object> implements IProvider<T> {
 
 	promise: Promise<mongodb.Collection>
 	options: object | undefined
+	type: T
 	translator: Translator<T>
 
-	constructor (collection: mongodb.Collection)
-	constructor (collection: Promise<mongodb.Collection>)
-	constructor (collection: Func0<Promise<mongodb.Collection>>)
-	constructor (collection: mongodb.Collection | Promise<mongodb.Collection> | Func0<Promise<mongodb.Collection>>, options?: object) {
-
+	constructor (type: T, collection: mongodb.Collection)
+	constructor (type: T, collection: Promise<mongodb.Collection>)
+	constructor (type: T, collection: Func0<Promise<mongodb.Collection>>)
+	constructor (type: T, collection: mongodb.Collection | Promise<mongodb.Collection> | Func0<Promise<mongodb.Collection>>, options?: object) {
 		if (typeof(collection) === 'function')
 			this.promise = collection()
 		else if (collection instanceof Promise)
@@ -48,6 +48,7 @@ export default class Provider<T extends object> implements IProvider<T> {
 			throw new TypeError(`unsupport type: ${(collection as object).constructor.name}`)
 		this.options = options
 
+		this.type = type
 		this.translator = Translator.create(type)
 	}
 

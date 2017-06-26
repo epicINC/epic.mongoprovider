@@ -8,4 +8,3 @@ export class SchemaReader<T> {
 		return {}
 	}
 }
-
