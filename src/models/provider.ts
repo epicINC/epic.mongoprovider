@@ -1,6 +1,7 @@
 import * as mongodb from '@types/mongodb'
 import * as filter from '../filters'
 import IProvider from './iprovider'
+
 import { MongoTranslator } from '../translators'
 import * as epic from 'epic.util'
 
@@ -23,16 +24,13 @@ function isQuery <T>(q: filter.Query<T> | filter.Where<T>) : q is filter.Query<T
 	return Reflect.has(q, 'where')
 }
 
-export function createProvider<T extends Object>(type: T)  {
-	
-}
 
 export default class Provider<T extends object> implements IProvider<T> {
 
 	promise: Promise<mongodb.Collection>
 	options: object | undefined
 	type: T
-	translator: Translator<T>
+	translator: MongoTranslator<T>
 
 	constructor (type: T, collection: mongodb.Collection)
 	constructor (type: T, collection: Promise<mongodb.Collection>)
@@ -49,7 +47,7 @@ export default class Provider<T extends object> implements IProvider<T> {
 		this.options = options
 
 		this.type = type
-		this.translator = Translator.create(type)
+		this.translator = new MongoTranslator(type)
 	}
 
 	get (query: filter.Query<T> | filter.Where<T>) {
@@ -87,8 +85,8 @@ export default class Provider<T extends object> implements IProvider<T> {
 
 	update (data: T | T[]) {
 		if (Array.isArray(data))
-			return this.bulk(data.map(e => ({ updateOne: { filter: this.translator.ID(e), update: } })))
-		return this.updateOne(this.translator.ID(data), data)
+			return this.bulk(data.map(e => ({ updateOne: { filter: this.translator.filter.ID(e), update: this.translator.update(e)} })))
+		return this.updateOne(this.translator.filter.ID(data), data)
 	}
 
 	updateOne (where: filter.Where<T>, data: any) {
@@ -97,6 +95,10 @@ export default class Provider<T extends object> implements IProvider<T> {
 
 	updateMany (where: filter.Where<T>, data: any) {
 		return this.promise.then(e => e.updateMany(<object>where, data))
+	}
+
+	delete (value: any|any[]) {
+		
 	}
 
 	// delete
