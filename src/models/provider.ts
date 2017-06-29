@@ -23,7 +23,7 @@ class Util {
 function isQuery <T>(q: filter.Query<T> | filter.Where<T>) : q is filter.Query<T> {
 	return Reflect.has(q, 'where')
 }
-
+// 
 
 export default class Provider<T extends object> implements IProvider<T> {
 
@@ -98,7 +98,7 @@ export default class Provider<T extends object> implements IProvider<T> {
 	}
 
 	delete (value: any|any[]) {
-		
+			
 	}
 
 	// delete

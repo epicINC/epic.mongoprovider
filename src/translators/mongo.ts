@@ -18,15 +18,25 @@ class Util {
 
 	static toString = Object.prototype.toString
 
+	static getType (value: any) : string {
+		return Util.toString.call(value)
+	}
+
+	static isObject (value: any) : boolean {
+		return Util.isObjectString(Util.getType(value))
+	}
+
+	private static isObjectString (type: string) : boolean {
+		return type === '[object Object]' || type === '[object Array]'
+	}
+
 	static flat (value: object) : object {
 		let result = {}, delimiter = '.',
 		each = (o: object, path: string[]) => {
+			let item: any
 			Object.keys(o).forEach(e => {
-				let
-					item = o[e],
-					isObject = (type => type === '[object Object]' || type === '[object Array]')(Util.toString.call(item))
-				if (isObject)
-					return each(item, path.concat(e))
+				item = o[e]
+				if (Util.isObject(item)) return each(item, path.concat(e))
 				result[path.join(delimiter)] = value
 			})
 		}
@@ -39,8 +49,14 @@ class Util {
 export class MongoFilter<T> implements IFilter<T> {
 
 	type: T
+	scheam: Scheam
 	constructor (type: T) {
 		this.type = type
+		this.scheam = Scheam.get(type)
+	}
+
+	hasID (value: any) {
+		return Reflect.has(value, this.scheam.id.name)
 	}
 
 	ID (value: T) : object {
